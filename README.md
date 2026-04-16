@@ -35,6 +35,7 @@
   <a href="https://github.com/anakrypt-kepler/Synapsenetai"><img src="https://img.shields.io/badge/Source_Code-000000?style=for-the-badge&logo=github&logoColor=white" alt="Source Code" /></a>
   <a href="https://github.com/anakrypt-kepler/SynapseNet"><img src="https://img.shields.io/badge/Docs_%26_Whitepaper-000000?style=for-the-badge&logo=gitbook&logoColor=white" alt="Docs and Whitepaper" /></a>
   <a href="https://github.com/anakrypt-kepler/Synapsenetai/tree/main/RELEASES"><img src="https://img.shields.io/badge/Releases-000000?style=for-the-badge&logo=rocket&logoColor=white" alt="Releases" /></a>
+  <a href="https://github.com/anakrypt-kepler/what-everyone-wont-tell-you-about-using-ai-the-right-way-by-kepler"><img src="https://img.shields.io/badge/AI_Tutorial-000000?style=for-the-badge&logo=readme&logoColor=white" alt="AI Tutorial" /></a>
 </p>
 
 <p align="center">
