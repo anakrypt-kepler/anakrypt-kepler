@@ -74,7 +74,87 @@ class ProfileTests(unittest.TestCase):
         mesh = (ROOT / 'assets/net-dark.svg').read_text()
         self.assertIn('animateMotion', mesh)
         self.assertIn('prefers-reduced-motion', mesh)
+        self.assertIn('.card{opacity:0}', mesh)
+        self.assertIn('#naan:hover~#card-naan', mesh)
+        self.assertIn('NaanAgent.svelte', mesh)
         self.assertIn('data:image/jpeg;base64,', (ROOT / 'assets/kepler-dark.svg').read_text())
+
+
+    def sample_mesh_data(self):
+        return {
+            "public_repos": 2,
+            "stars": 3,
+            "repos": [
+                {"name": "Synapsenetai", "stargazers_count": 3},
+                {"name": profile.LOGIN, "stargazers_count": 0},
+            ],
+        }
+
+    def test_node_briefs_cover_the_mesh(self):
+        names = {name for name, *_ in profile.mesh_nodes()}
+        self.assertEqual(set(profile.node_briefs()), names)
+        for name, info in profile.node_briefs().items():
+            self.assertTrue(info["title"])
+            self.assertTrue(info["blurb"])
+            self.assertEqual(len(info["files"]), 3)
+            for path in info["files"]:
+                self.assertNotIn("<", path)
+                self.assertNotIn("javascript:", path.lower())
+            self.assertRegex(profile.node_slug(name), r"^[a-z][a-z0-9-]*$")
+
+    def test_node_slug_rejects_unsafe_names(self):
+        with self.assertRaises(ValueError):
+            profile.node_slug("123bad")
+        with self.assertRaises(ValueError):
+            profile.node_slug("")
+
+    def test_card_box_stays_inside_the_mesh(self):
+        for x, y in [(0, 0), (459, 247), (830, 450), (118, 280), (703, 187)]:
+            left, top, width, height = profile.card_box(x, y)
+            self.assertGreaterEqual(left, 16)
+            self.assertGreaterEqual(top, 82)
+            self.assertLessEqual(left + width, 824)
+            self.assertLessEqual(top + height, 424)
+
+    def test_ticker_animation_uses_one_full_cycle(self):
+        count = len(profile.mesh_nodes())
+        seen_ones = []
+        for index in range(count):
+            cycle, times, values = profile.ticker_animation(index, count)
+            self.assertEqual(cycle, round(count * 3.2, 1))
+            self.assertEqual(times[0], 0)
+            self.assertEqual(times[-1], 1)
+            self.assertEqual(len(times), len(values))
+            self.assertEqual(times, sorted(times))
+            self.assertTrue(any(value == "1" for value in values))
+            for left, right in zip(times, times[1:]):
+                self.assertLess(left, right)
+            seen_ones.append(values)
+        self.assertEqual(seen_ones[0][0], "1")
+        self.assertEqual(seen_ones[1][0], "0")
+
+    def test_mesh_hover_cards_and_ticker_are_safe(self):
+        svg = profile.net(self.sample_mesh_data(), "dark").finish()
+        root = ET.fromstring(svg)
+        ns = {"svg": "http://www.w3.org/2000/svg"}
+        self.assertEqual(len(root.findall(".//{http://www.w3.org/2000/svg}script")), 0)
+        for element in root.iter():
+            self.assertFalse(any(key.lower().startswith("on") for key in element.attrib))
+        slugs = [profile.node_slug(name) for name, *_ in profile.mesh_nodes()]
+        for slug in slugs:
+            node = root.find(f'.//svg:g[@id="{slug}"]', ns)
+            card = root.find(f'.//svg:g[@id="card-{slug}"]', ns)
+            self.assertIsNotNone(node, slug)
+            self.assertIsNotNone(card, slug)
+            self.assertIn(f"#{slug}:hover~#card-{slug}", svg)
+            self.assertLess(list(root).index(node), list(root).index(card))
+            title = node.find("{http://www.w3.org/2000/svg}title")
+            self.assertIsNotNone(title)
+            self.assertIn("Files:", title.text)
+        self.assertIn("src/ide/synapsed_engine.cpp", svg)
+        self.assertIn('class="motion"', svg)
+        self.assertIn("static-legend", svg)
+        self.assertNotIn("<script", svg)
 
 
 if __name__ == "__main__":

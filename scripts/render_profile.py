@@ -174,10 +174,102 @@ def font_style():
     return "@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 800;src:url(data:font/woff2;base64," + encoded + ") format('woff2')}"
 
 
+def mesh_nodes():
+    return (
+        ("Synapsenetai", 459, 247, True),
+        (LOGIN, 571, 134, True),
+        ("NAAN", 253, 225, False),
+        ("PoE", 338, 318, False),
+        ("Tor", 386, 130, False),
+        ("Knowledge", 629, 264, False),
+        ("Desktop", 573, 352, False),
+        ("Wallet", 218, 357, False),
+        ("P2P", 703, 187, False),
+        ("C++ engine", 426, 395, False),
+        ("Local GGUF", 174, 150, False),
+        ("Rust FFI", 118, 280, False),
+    )
+
+
+def node_briefs():
+    return {
+        "Synapsenetai": {"title": "Synapsenetai", "blurb": "SynapseNet desktop and engine", "files": ("src/ide/synapsed_engine.cpp", "tauri-app/src/app/App.svelte", "src-tauri/src/commands.rs")},
+        LOGIN: {"title": "Profile", "blurb": "This public GitHub profile", "files": ("scripts/render_profile.py", "assets/net-dark.svg", "README.md")},
+        "NAAN": {"title": "NAAN", "blurb": "Local harvest agents", "files": ("src/ide/synapsed_engine.cpp", "routes/NaanAgent.svelte", "lib/naanCrew.ts")},
+        "PoE": {"title": "Proof of Emergence", "blurb": "Peer knowledge consensus", "files": ("src/core/poe_v1.cpp", "include/core/poe_v1.h", "src/node/poe_runtime.cpp")},
+        "Tor": {"title": "Tor", "blurb": "Fail-closed peer transport", "files": ("src/web/tor_fetch.cpp", "src/core/tor_route_policy.cpp", "src/core/tor_process_guard.cpp")},
+        "Knowledge": {"title": "Knowledge", "blurb": "Shared knowledge store", "files": ("src/core/knowledge.cpp", "include/core/knowledge.h", "routes/Knowledge.svelte")},
+        "Desktop": {"title": "Desktop", "blurb": "Tauri pixel cell", "files": ("tauri-app/src/app/App.svelte", "sprites/NaanStation.svelte", "src-tauri/src/lib.rs")},
+        "Wallet": {"title": "Wallet", "blurb": "Local wallet and claims", "files": ("src/core/wallet.cpp", "include/core/wallet.h", "routes/Wallet.svelte")},
+        "P2P": {"title": "P2P", "blurb": "Peer identity and mesh", "files": ("src/core/tor_peer_identity.cpp", "src/node/poe_runtime.cpp", "src/cli/synapsed_poe_mesh.cpp")},
+        "C++ engine": {"title": "C++ engine", "blurb": "Native synapsed runtime", "files": ("src/ide/synapsed_engine.cpp", "src/ide/synapsed_engine.h", "src/core/naan_task_share.cpp")},
+        "Local GGUF": {"title": "Local GGUF", "blurb": "On-disk model weights", "files": ("components/ModelCatalog.svelte", "src/ide/synapsed_engine.cpp", "third_party/llama.cpp")},
+        "Rust FFI": {"title": "Rust FFI", "blurb": "Desktop engine bridge", "files": ("src-tauri/src/commands.rs", "tauri-app/src/lib/rpc.ts", "src-tauri/src/lib.rs")},
+    }
+
+
+def node_slug(name):
+    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    if not re.fullmatch(r"[a-z][a-z0-9-]*", slug):
+        raise ValueError("Unsafe mesh node name: " + name)
+    return slug
+
+
+def card_box(x, y, width=252, height=102):
+    left = x + 18
+    top = y - height / 2
+    if left + width > 824:
+        left = x - width - 18
+    left = min(max(16.0, left), float(840 - width - 16))
+    top = min(max(82.0, top), float(424 - height))
+    return (round(left, 1), round(top, 1), width, height)
+
+
+def ticker_line(info):
+    return info["title"] + "   " + "   ".join(info["files"][:2])
+
+
+def ticker_animation(index, count, period=3.2):
+    if count < 1:
+        raise ValueError("Ticker needs at least one node")
+    cycle = round(count * period, 1)
+    fade = 0.012
+    start = index / count
+    end = (index + 1) / count
+    if index == 0:
+        times = [0.0, round(end - fade, 4), round(end, 4), 1.0]
+        values = ["1", "1", "0", "0"]
+    elif index == count - 1:
+        times = [0.0, round(start, 4), round(min(1.0, start + fade), 4), round(1.0 - fade, 4), 1.0]
+        values = ["0", "0", "1", "1", "0"]
+    else:
+        times = [0.0, round(start, 4), round(min(1.0, start + fade), 4), round(max(start + fade, end - fade), 4), round(end, 4), 1.0]
+        values = ["0", "0", "1", "1", "0", "0"]
+    cleaned_times = []
+    cleaned_values = []
+    for time, value in zip(times, values):
+        time = min(max(time, 0.0), 1.0)
+        if cleaned_times and time <= cleaned_times[-1]:
+            time = min(1.0, round(cleaned_times[-1] + 0.0001, 4))
+        cleaned_times.append(time)
+        cleaned_values.append(value)
+    cleaned_times[-1] = 1.0
+    return cycle, cleaned_times, cleaned_values
+
+
+def mesh_hover_style(slugs):
+    rules = [".card{opacity:0}", ".static-legend{display:none}"]
+    for slug in slugs:
+        rules.append(f"#{slug}:hover~#card-{slug},#{slug}:focus-within~#card-{slug}{{opacity:1}}")
+    rules.append("@media(prefers-reduced-motion:reduce){.static-legend{display:block}}")
+    return "".join(rules)
+
+
 class SVG:
-    def __init__(self, height, theme, title, width=840):
+    def __init__(self, height, theme, title, width=840, extra_style=""):
         self.height, self.width, self.title = height, width, title
         self.colors = THEMES[theme]
+        self.extra_style = extra_style
         self.parts = []
 
     def raw(self, value):
@@ -200,12 +292,17 @@ class SVG:
 
     def finish(self):
         title = escape(self.title, quote=True)
-        style = font_style() + "text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre}.reveal{animation:reveal .8s ease both}@keyframes reveal{from{opacity:0}to{opacity:1}}@media(prefers-reduced-motion:reduce){.motion{display:none}.reveal{animation:none!important}}"
+        style = font_style() + "text{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre}.reveal{animation:reveal .8s ease both}@keyframes reveal{from{opacity:0}to{opacity:1}}@media(prefers-reduced-motion:reduce){.motion{display:none}.reveal{animation:none!important}}" + self.extra_style
         return f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{self.width}" height="{self.height}" viewBox="0 0 {self.width} {self.height}" role="img" aria-label="{title}">\n<title>{title}</title>\n<style>{style}</style>\n' + "\n".join(self.parts) + "\n</svg>\n"
 
 
 def net(data, theme):
-    svg = SVG(460, theme, "Kepler — SynapseNet repositories and components, animated mesh")
+    names = mesh_nodes()
+    briefs = node_briefs()
+    if set(briefs) != {name for name, *_ in names}:
+        raise ValueError("Mesh node briefs must cover every node and only those nodes")
+    slugs = [node_slug(name) for name, *_ in names]
+    svg = SVG(460, theme, "Kepler — SynapseNet repositories and components, animated mesh", extra_style=mesh_hover_style(slugs))
     svg.raw(f'<defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="{svg.colors["grid"]}"/></pattern></defs>')
     svg.rect(0, 0, 840, 460, "url(#grid)")
     for path in ["M14 30V14H30", "M826 30V14h-16", "M14 430v16h16", "M826 430v16h-16"]:
@@ -214,7 +311,6 @@ def net(data, theme):
     svg.text(104, 40, "@" + LOGIN, 13, ACCENT)
     svg.text(22, 62, "local intelligence, shared knowledge, connected systems", 12)
     svg.rect(0, 76, 840, 1, svg.colors["edge"])
-    names = [("Synapsenetai", 459, 247, True), (LOGIN, 571, 134, True), ("NAAN", 253, 225, False), ("PoE", 338, 318, False), ("Tor", 386, 130, False), ("Knowledge", 629, 264, False), ("Desktop", 573, 352, False), ("Wallet", 218, 357, False), ("P2P", 703, 187, False), ("C++ engine", 426, 395, False), ("Local GGUF", 174, 150, False), ("Rust FFI", 118, 280, False)]
     edges = set()
     for i, (_, x, y, _) in enumerate(names):
         nearest = sorted((j for j in range(len(names)) if j != i), key=lambda j: math.hypot(names[j][1] - x, names[j][2] - y))[:2]
@@ -232,16 +328,39 @@ def net(data, theme):
         radius = 14 + min(8, math.sqrt(repo["stargazers_count"])) if repo else 6
         stroke = ACCENT if repository else svg.colors["dim"]
         fill = ACCENT if repository else svg.colors["card"]
+        slug = node_slug(name)
+        info = briefs[name]
+        hit = max(radius + 10, 20)
+        svg.raw(f'<g id="{slug}" class="node" tabindex="0">')
+        svg.raw(f'<title>{escape(info["title"])}: {escape(info["blurb"])}. Files: {escape(", ".join(info["files"]))}</title>')
+        svg.raw(f'<circle class="hit" cx="{x}" cy="{y}" r="{hit}" fill="#000" fill-opacity="0"/>')
         if repository:
             svg.raw(f'<circle class="motion" cx="{x}" cy="{y}" r="{radius}" fill="none" stroke="{ACCENT}"><animate attributeName="r" values="{radius};{radius + 12}" dur="2.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0" dur="2.8s" repeatCount="indefinite"/></circle>')
-        svg.raw(f'<circle cx="{x}" cy="{y}" r="{radius}" fill="{fill}" stroke="{stroke}" stroke-width="1.5"/>')
+        svg.raw(f'<circle class="core" cx="{x}" cy="{y}" r="{radius}" fill="{fill}" stroke="{stroke}" stroke-width="1.5"/>')
         label = name + (f' / {repo["stargazers_count"]} stars' if repo else "")
         if name == LOGIN:
             svg.text(x, y - 26, "Profile", 12, "text", text_anchor="middle")
         else:
             svg.text(x + radius + 10 if x < 500 else x - radius - 10, y + 4, label, 12, "text" if repository else "muted", text_anchor="start" if x < 500 else "end")
-    svg.text(22, 432, "filled: repositories / outlined: project components", 10, "dim")
+        svg.raw("</g>")
+    for index, (name, *_) in enumerate(names):
+        line = ticker_line(briefs[name])
+        cycle, key_times, values = ticker_animation(index, len(names))
+        svg.raw(f'<g class="motion" opacity="0"><text x="22" y="432" fill="{svg.colors["dim"]}" font-size="10">{escape(line)}</text><animate attributeName="opacity" values="{",".join(values)}" keyTimes="{";".join(f"{time:.4f}" for time in key_times)}" dur="{cycle}s" begin="0s" repeatCount="indefinite"/></g>')
+    svg.raw(f'<text class="static-legend" x="22" y="432" fill="{svg.colors["dim"]}" font-size="10">filled: repositories / outlined: project components</text>')
     svg.text(818, 432, f'{data["public_repos"]} public repos / {data["stars"]} stars', 10, "dim", text_anchor="end")
+    for name, x, y, _ in names:
+        info = briefs[name]
+        slug = node_slug(name)
+        left, top, width, height = card_box(x, y)
+        svg.raw(f'<g id="card-{slug}" class="card">')
+        svg.rect(left, top, width, height, svg.colors["card"], rx=6, stroke=ACCENT)
+        svg.rect(left, top, 3, height, ACCENT)
+        svg.text(left + 14, top + 22, info["title"], 12, "text", font_weight=600)
+        svg.text(left + 14, top + 40, info["blurb"], 10, "muted")
+        for index, path in enumerate(info["files"][:3]):
+            svg.text(left + 14, top + 62 + index * 14, path, 10, "dim")
+        svg.raw("</g>")
     return svg
 
 
