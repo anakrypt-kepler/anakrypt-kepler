@@ -77,7 +77,7 @@ class ProfileTests(unittest.TestCase):
         self.assertIn('.card{opacity:0}', mesh)
         self.assertIn('#naan:hover~#card-naan', mesh)
         self.assertIn('NaanAgent.svelte', mesh)
-        self.assertIn('data:image/jpeg;base64,', (ROOT / 'assets/kepler-dark.svg').read_text())
+        self.assertIn('data:image/jpeg;base64,', (ROOT / 'assets/portrait-dark.svg').read_text())
 
 
     def sample_mesh_data(self):

@@ -464,9 +464,9 @@ def card(repo, data, theme):
 def portrait_data():
     with Image.open(ASSETS / "kepler.jpg") as original:
         portrait = ImageOps.exif_transpose(original).convert("RGB")
-        portrait.thumbnail((440, 440), Image.Resampling.LANCZOS)
+        portrait.thumbnail((600, 600), Image.Resampling.LANCZOS)
         buffer = BytesIO()
-        portrait.save(buffer, format="JPEG", quality=90)
+        portrait.save(buffer, format="JPEG", quality=95)
     return base64.b64encode(buffer.getvalue()).decode()
 
 
@@ -512,7 +512,7 @@ def footer(data, theme):
 def render(data):
     repos = {repo["name"]: repo for repo in data["repos"]}
     for theme in THEMES:
-        graphics = {"net": net(data, theme), "tiles": tiles(data, theme), "heat": heat(data, theme), "langs": langs(data, theme), "selected": strip(theme), "kepler": kepler(theme), "upstream": upstream(data, theme), "footer": footer(data, theme)}
+        graphics = {"net": net(data, theme), "tiles": tiles(data, theme), "heat": heat(data, theme), "langs": langs(data, theme), "selected": strip(theme), "portrait": kepler(theme), "upstream": upstream(data, theme), "footer": footer(data, theme)}
         for name in ["Synapsenetai", LOGIN]:
             graphics["card-" + name.lower()] = card(repos[name], data, theme)
         for name, graphic in graphics.items():
