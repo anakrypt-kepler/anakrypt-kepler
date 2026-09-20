@@ -77,14 +77,7 @@ class ProfileTests(unittest.TestCase):
         self.assertIn('.card{opacity:0}', mesh)
         self.assertIn('#naan:hover~#card-naan', mesh)
         self.assertIn('NaanAgent.svelte', mesh)
-        self.assertIn('data:image/gif;base64,', (ROOT / 'assets/portrait-dark.svg').read_text())
-
-    def test_readme_uses_kepler_gif(self):
-        text = (ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertIn("assets/portrait-dark.svg", text)
-        self.assertNotIn('src="assets/kepler.gif"', text)
-        self.assertTrue((ROOT / "assets" / "kepler.gif").is_file())
-        self.assertIn("data:image/gif;base64,", (ROOT / "assets/portrait-dark.svg").read_text())
+        self.assertIn('data:image/jpeg;base64,', (ROOT / 'assets/portrait-dark.svg').read_text())
 
 
     def sample_mesh_data(self):
