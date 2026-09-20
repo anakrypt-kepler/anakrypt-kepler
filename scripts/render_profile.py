@@ -6,7 +6,6 @@ from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from html import escape
 from html.parser import HTMLParser
-from io import BytesIO
 import json
 import math
 import os
@@ -15,8 +14,6 @@ import re
 import textwrap
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
-
-from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "assets"
@@ -462,19 +459,17 @@ def card(repo, data, theme):
 
 
 def portrait_data():
-    with Image.open(ASSETS / "kepler.jpg") as original:
-        portrait = ImageOps.exif_transpose(original).convert("RGB")
-        portrait.thumbnail((600, 600), Image.Resampling.LANCZOS)
-        buffer = BytesIO()
-        portrait.save(buffer, format="JPEG", quality=95)
-    return base64.b64encode(buffer.getvalue()).decode()
+    gif = ASSETS / "kepler.gif"
+    if not gif.is_file():
+        raise FileNotFoundError("assets/kepler.gif is required")
+    return base64.b64encode(gif.read_bytes()).decode()
 
 
 def kepler(theme):
     svg = SVG(325, theme, "Kepler — independent builder of SynapseNet")
     svg.section("Kepler / SynapseNet", "independent builder")
     svg.rect(22, 58, 206, 250, svg.colors["card"], rx=6, stroke=svg.colors["edge"])
-    svg.raw(f'<image x="25" y="72" width="200" height="220" href="data:image/jpeg;base64,{portrait_data()}" preserveAspectRatio="xMidYMid meet"/>')
+    svg.raw(f'<image x="25" y="72" width="200" height="220" href="data:image/gif;base64,{portrait_data()}" preserveAspectRatio="xMidYMid meet"/>')
     rows = [("SynapseNet", "Decentralized intelligence, built in the open."), ("Local AI + NAAN", "Local models and knowledge contributions."), ("Tor + Proof of Emergence", "Peer communication and knowledge validation."), ("C++ / Rust / Tauri / Svelte", "From the native engine to the desktop cell.")]
     for index, (title, subtitle) in enumerate(rows):
         y = 88 + index * 51
