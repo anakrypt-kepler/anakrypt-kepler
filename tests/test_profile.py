@@ -79,6 +79,12 @@ class ProfileTests(unittest.TestCase):
         self.assertIn('NaanAgent.svelte', mesh)
         self.assertIn('data:image/jpeg;base64,', (ROOT / 'assets/portrait-dark.svg').read_text())
 
+    def test_readme_uses_kepler_gif(self):
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("assets/kepler.gif", text)
+        self.assertNotIn("assets/portrait-dark.svg", text)
+        self.assertTrue((ROOT / "assets" / "kepler.gif").is_file())
+
 
     def sample_mesh_data(self):
         return {

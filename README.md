@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/anakrypt-kepler/Synapsenetai"><picture><source media="(prefers-color-scheme: light)" srcset="assets/portrait-light.svg" /><img src="assets/portrait-dark.svg" alt="Kepler, independent builder of SynapseNet. Local AI, NAAN, Tor, Proof of Emergence, C++, Rust, Tauri, and Svelte. Intelligence belongs to everyone." width="100%" /></picture></a>
+  <a href="https://github.com/anakrypt-kepler/Synapsenetai"><img src="assets/kepler.gif" alt="Kepler, independent builder of SynapseNet. Local AI, NAAN, Tor, Proof of Emergence, C++, Rust, Tauri, and Svelte. Intelligence belongs to everyone." width="480" /></a>
   <picture><source media="(prefers-color-scheme: light)" srcset="assets/upstream-light.svg" /><img src="assets/upstream-dark.svg" alt="Public pull requests merged into other people's repositories." width="100%" /></picture>
   <picture><source media="(prefers-color-scheme: light)" srcset="assets/footer-light.svg" /><img src="assets/footer-dark.svg" alt="Local models. Shared knowledge. Open infrastructure. Public data refreshed daily." width="100%" /></picture>
   <a href="https://github.com/anakrypt-kepler/Synapsenetai">SynapseNet</a> · <a href="https://github.com/anakrypt-kepler?tab=repositories">All repositories</a> · <a href="https://github.com/anakrypt-kepler/Synapsenetai/issues">Issues &amp; ideas</a>
