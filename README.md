@@ -13,6 +13,7 @@
 
 <p align="center">
   <a href="https://github.com/anakrypt-kepler/Synapsenetai"><picture><source media="(prefers-color-scheme: light)" srcset="assets/portrait-light-20261124b.svg" /><img src="assets/portrait-dark-20261124b.svg" alt="Kepler, independent builder of SynapseNet. Local AI, NAAN, Tor, Proof of Emergence, C++, Rust, Tauri, and Svelte. Intelligence belongs to everyone." width="100%" /></picture></a>
+  <picture><source media="(prefers-color-scheme: light)" srcset="assets/inspiration-light.svg" /><img src="assets/inspiration-dark.svg" alt="Gottfrid Svartholm and Satoshi Nakamoto. These are the people who strongly inspire me." width="100%" /></picture>
   <picture><source media="(prefers-color-scheme: light)" srcset="assets/upstream-light-20261124b.svg" /><img src="assets/upstream-dark-20261124b.svg" alt="Public pull requests merged into other people's repositories." width="100%" /></picture>
   <picture><source media="(prefers-color-scheme: light)" srcset="assets/footer-light-20261124b.svg" /><img src="assets/footer-dark-20261124b.svg" alt="Local models. Shared knowledge. Open infrastructure. Public data refreshed daily." width="100%" /></picture>
   <a href="https://github.com/anakrypt-kepler/Synapsenetai">SynapseNet</a> · <a href="https://github.com/anakrypt-kepler?tab=repositories">All repositories</a> · <a href="https://github.com/anakrypt-kepler/Synapsenetai/issues">Issues &amp; ideas</a>
