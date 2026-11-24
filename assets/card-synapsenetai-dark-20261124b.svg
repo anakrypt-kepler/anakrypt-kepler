@@ -5,7 +5,7 @@
 <rect x="0.5" y="0.5" width="3" height="179" fill="#D4D4D8" />
 <g fill="none" stroke="#D4D4D8" stroke-width="2" opacity=".15"><path d="M317 65l34 -20 34 20v40l-34 20-34-20ZM317 65l34 20 34-20M351 85v40"/><circle cx="351" cy="85" r="12"/></g>
 <text x="22" y="34" fill="#F4F4F5" font-size="16" font-weight="600">Synapsenetai</text>
-<text x="388" y="56" fill="#F34B7D" font-size="11" text-anchor="end">C++</text>
+<text x="388" y="56" fill="#A1A1AA" font-size="11" text-anchor="end">C++</text>
 <text x="22" y="80" fill="#A1A1AA" font-size="12.5" >Decentralized intelligence. Local GGUF</text>
 <text x="22" y="99" fill="#A1A1AA" font-size="12.5" >models, Tor peers, and Proof of Emergence.</text>
 <rect x="22" y="141" width="366" height="1" fill="#24242A" />

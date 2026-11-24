@@ -21,12 +21,18 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "assets"
 LOGIN = "anakrypt-kepler"
-ASSET_REV = "20261124"
+ASSET_REV = "20261124b"
 THEMES = {
     "dark": {"text": "#F4F4F5", "muted": "#A1A1AA", "dim": "#71717A", "edge": "#24242A", "card": "#101013", "grid": "#151518", "accent": "#D4D4D8"},
     "light": {"text": "#18181B", "muted": "#52525B", "dim": "#71717A", "edge": "#E4E4E7", "card": "#FAFAFA", "grid": "#F4F4F5", "accent": "#18181B"},
 }
-COLORS = {"C++": "#F34B7D", "C": "#555555", "Python": "#3572A5", "Rust": "#DEA584", "TypeScript": "#3178C6", "JavaScript": "#F1E05A", "Svelte": "#FF3E00", "Shell": "#89E051", "CMake": "#DA3434", "HTML": "#E34C26", "CSS": "#563D7C", "Other": "#71717A"}
+
+
+def language_gray(theme, index):
+    dark = ["#F4F4F5", "#52525B", "#A1A1AA", "#3F3F46", "#D4D4D8", "#71717A", "#E4E4E7", "#27272A"]
+    light = ["#18181B", "#A1A1AA", "#3F3F46", "#D4D4D8", "#52525B", "#71717A", "#09090B", "#E4E4E7"]
+    ramp = dark if theme == "dark" else light
+    return ramp[index % len(ramp)]
 
 
 def download(url, authenticated=False):
@@ -427,12 +433,12 @@ def langs(data, theme):
     x = 0
     for index, (name, fraction) in enumerate(shares):
         width = fraction * 840
-        svg.rect(round(x, 2), 64, max(.1, round(width - 1, 2)), 26, COLORS.get(name, "#A78BFA"), class_="reveal", style=f"animation-delay:{index * .08}s")
+        svg.rect(round(x, 2), 64, max(.1, round(width - 1, 2)), 26, language_gray(theme, index), class_="reveal", style=f"animation-delay:{index * .08}s")
         x += width
     svg.raw('</g>')
     for i, (name, fraction) in enumerate(shares):
         x, y = 22 + (i % 4) * 205, 116 + (i // 4) * 27
-        svg.raw(f'<circle cx="{x}" cy="{y - 4}" r="3" fill="{COLORS.get(name, "#A78BFA")}"/>')
+        svg.raw(f'<circle cx="{x}" cy="{y - 4}" r="3" fill="{language_gray(theme, i)}"/>')
         percent = f"{fraction * 100:.1f}%" if fraction >= .001 else "<0.1%"
         svg.text(x + 9, y, f"{name} {percent}", 11)
     return svg
@@ -451,7 +457,7 @@ def card(repo, data, theme):
     svg.raw(f'<g fill="none" stroke="{svg.colors["accent"]}" stroke-width="2" opacity=".15"><path d="M317 65l34 -20 34 20v40l-34 20-34-20ZM317 65l34 20 34-20M351 85v40"/><circle cx="351" cy="85" r="12"/></g>')
     svg.text(22, 34, repo["name"], 16, "text", font_weight=600)
     language = repo["language"] or "Profile"
-    svg.text(388, 56, language, 11, COLORS.get(language, "muted"), text_anchor="end")
+    svg.text(388, 56, language, 11, "muted", text_anchor="end")
     description = "Decentralized intelligence. Local GGUF models, Tor peers, and Proof of Emergence." if repo["name"] == "Synapsenetai" else "Kepler's profile. Animated project mesh, contribution history, and public GitHub statistics."
     for index, line in enumerate(textwrap.wrap(description, 43)[:3]):
         svg.text(22, 80 + index * 19, line, 12.5)
