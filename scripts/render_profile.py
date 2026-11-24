@@ -21,10 +21,9 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "assets"
 LOGIN = "anakrypt-kepler"
-ACCENT = "#FF4D0D"
 THEMES = {
-    "dark": {"text": "#F4F4F5", "muted": "#A1A1AA", "dim": "#71717A", "edge": "#24242A", "card": "#101013", "grid": "#151518"},
-    "light": {"text": "#18181B", "muted": "#52525B", "dim": "#71717A", "edge": "#E4E4E7", "card": "#FAFAFA", "grid": "#F4F4F5"},
+    "dark": {"text": "#F4F4F5", "muted": "#A1A1AA", "dim": "#71717A", "edge": "#24242A", "card": "#101013", "grid": "#151518", "accent": "#D4D4D8"},
+    "light": {"text": "#18181B", "muted": "#52525B", "dim": "#71717A", "edge": "#E4E4E7", "card": "#FAFAFA", "grid": "#F4F4F5", "accent": "#18181B"},
 }
 COLORS = {"C++": "#F34B7D", "C": "#555555", "Python": "#3572A5", "Rust": "#DEA584", "TypeScript": "#3178C6", "JavaScript": "#F1E05A", "Svelte": "#FF3E00", "Shell": "#89E051", "CMake": "#DA3434", "HTML": "#E34C26", "CSS": "#563D7C", "Other": "#71717A"}
 
@@ -287,7 +286,8 @@ class SVG:
     def section(self, title, note=""):
         self.text(22, 28, title.upper(), 16, "text", font_weight=600, letter_spacing=1.5)
         self.text(self.width - 22, 28, note, 11, "dim", text_anchor="end")
-        self.raw(f'<defs><linearGradient id="rule"><stop stop-color="{ACCENT}" stop-opacity=".9"/><stop offset="1" stop-color="{ACCENT}" stop-opacity="0"/></linearGradient></defs>')
+        accent = self.colors["accent"]
+        self.raw(f'<defs><linearGradient id="rule"><stop stop-color="{accent}" stop-opacity=".9"/><stop offset="1" stop-color="{accent}" stop-opacity="0"/></linearGradient></defs>')
         self.rect(0, 40, self.width, 1, "url(#rule)")
 
     def finish(self):
@@ -306,9 +306,9 @@ def net(data, theme):
     svg.raw(f'<defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="{svg.colors["grid"]}"/></pattern></defs>')
     svg.rect(0, 0, 840, 460, "url(#grid)")
     for path in ["M14 30V14H30", "M826 30V14h-16", "M14 430v16h16", "M826 430v16h-16"]:
-        svg.raw(f'<path d="{path}" fill="none" stroke="{ACCENT}" stroke-width="2"/>')
+        svg.raw(f'<path d="{path}" fill="none" stroke="{svg.colors["accent"]}" stroke-width="2"/>')
     svg.text(22, 40, "Kepler", 19, "text", font_weight=600, letter_spacing=1)
-    svg.text(104, 40, "@" + LOGIN, 13, ACCENT)
+    svg.text(104, 40, "@" + LOGIN, 13, svg.colors["accent"])
     svg.text(22, 62, "local intelligence, shared knowledge, connected systems", 12)
     svg.rect(0, 76, 840, 1, svg.colors["edge"])
     edges = set()
@@ -321,13 +321,13 @@ def net(data, theme):
         _, x2, y2, _ = names[b]
         svg.raw(f'<path id="edge{index}" d="M{x1},{y1}L{x2},{y2}" fill="none" stroke="{svg.colors["edge"]}"/>')
         duration, begin = 3.5 + index % 7 * .19, -(index * .37 % 4)
-        svg.raw(f'<circle class="motion" r="2" fill="{ACCENT}" opacity="0"><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.88;1" dur="{duration:.2f}s" begin="{begin:.2f}s" repeatCount="indefinite"/><animateMotion dur="{duration:.2f}s" begin="{begin:.2f}s" repeatCount="indefinite"><mpath href="#edge{index}" xlink:href="#edge{index}"/></animateMotion></circle>')
+        svg.raw(f'<circle class="motion" r="2" fill="{svg.colors["accent"]}" opacity="0"><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.88;1" dur="{duration:.2f}s" begin="{begin:.2f}s" repeatCount="indefinite"/><animateMotion dur="{duration:.2f}s" begin="{begin:.2f}s" repeatCount="indefinite"><mpath href="#edge{index}" xlink:href="#edge{index}"/></animateMotion></circle>')
     repositories = {repo["name"]: repo for repo in data["repos"]}
     for name, x, y, repository in names:
         repo = repositories.get(name)
         radius = 14 + min(8, math.sqrt(repo["stargazers_count"])) if repo else 6
-        stroke = ACCENT if repository else svg.colors["dim"]
-        fill = ACCENT if repository else svg.colors["card"]
+        stroke = svg.colors["accent"] if repository else svg.colors["dim"]
+        fill = svg.colors["accent"] if repository else svg.colors["card"]
         slug = node_slug(name)
         info = briefs[name]
         hit = max(radius + 10, 20)
@@ -335,7 +335,7 @@ def net(data, theme):
         svg.raw(f'<title>{escape(info["title"])}: {escape(info["blurb"])}. Files: {escape(", ".join(info["files"]))}</title>')
         svg.raw(f'<circle class="hit" cx="{x}" cy="{y}" r="{hit}" fill="#000" fill-opacity="0"/>')
         if repository:
-            svg.raw(f'<circle class="motion" cx="{x}" cy="{y}" r="{radius}" fill="none" stroke="{ACCENT}"><animate attributeName="r" values="{radius};{radius + 12}" dur="2.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0" dur="2.8s" repeatCount="indefinite"/></circle>')
+            svg.raw(f'<circle class="motion" cx="{x}" cy="{y}" r="{radius}" fill="none" stroke="{svg.colors["accent"]}"><animate attributeName="r" values="{radius};{radius + 12}" dur="2.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0" dur="2.8s" repeatCount="indefinite"/></circle>')
         svg.raw(f'<circle class="core" cx="{x}" cy="{y}" r="{radius}" fill="{fill}" stroke="{stroke}" stroke-width="1.5"/>')
         label = name + (f' / {repo["stargazers_count"]} stars' if repo else "")
         if name == LOGIN:
@@ -354,8 +354,8 @@ def net(data, theme):
         slug = node_slug(name)
         left, top, width, height = card_box(x, y)
         svg.raw(f'<g id="card-{slug}" class="card">')
-        svg.rect(left, top, width, height, svg.colors["card"], rx=6, stroke=ACCENT)
-        svg.rect(left, top, 3, height, ACCENT)
+        svg.rect(left, top, width, height, svg.colors["card"], rx=6, stroke=svg.colors["accent"])
+        svg.rect(left, top, 3, height, svg.colors["accent"])
         svg.text(left + 14, top + 22, info["title"], 12, "text", font_weight=600)
         svg.text(left + 14, top + 40, info["blurb"], 10, "muted")
         for index, path in enumerate(info["files"][:3]):
@@ -372,10 +372,10 @@ def tiles(data, theme):
     values = [(data["public_repos"], "PUBLIC REPOSITORIES"), (data["stars"], "STARS EARNED"), (data["followers"], "FOLLOWERS"), (data["upstream_count"], "MERGED UPSTREAM"), (age, "ON GITHUB")]
     for index, (value, name) in enumerate(values):
         x = round(index * 169.6, 1)
-        color = ACCENT if index in (1, 3) else svg.colors["edge"]
+        color = svg.colors["accent"] if index in (1, 3) else svg.colors["edge"]
         svg.rect(x, .5, 161.6, 91, svg.colors["card"], rx=6, stroke=svg.colors["edge"])
         svg.rect(x, .5, 3, 91, color)
-        svg.text(x + 80.8, 46, value, 24, ACCENT if index in (1, 3) else "text", text_anchor="middle", font_weight=600)
+        svg.text(x + 80.8, 46, value, 24, svg.colors["accent"] if index in (1, 3) else "text", text_anchor="middle", font_weight=600)
         svg.text(x + 80.8, 68, name, 9, "dim", text_anchor="middle", letter_spacing=.7)
     return svg
 
@@ -390,7 +390,7 @@ def heat(data, theme):
     last = date.fromisoformat(days[-1]["date"])
     columns = (last - origin).days // 7 + 1
     step = min(14, 764 / columns)
-    colors = [svg.colors["edge"], "#4B2114", "#853417", "#C74311", ACCENT] if theme == "dark" else ["#E4E4E7", "#FFDBC9", "#FFB48A", "#FF8050", ACCENT]
+    colors = ["#24242A", "#3F3F46", "#52525B", "#A1A1AA", "#D4D4D8"] if theme == "dark" else ["#E4E4E7", "#A1A1AA", "#71717A", "#3F3F46", "#18181B"]
     month = None
     for column in range(columns):
         sunday = origin + timedelta(days=column * 7)
@@ -446,8 +446,8 @@ def strip(theme):
 def card(repo, data, theme):
     svg = SVG(180, theme, f'{repo["name"]} — {repo["stargazers_count"]} stars', width=410)
     svg.rect(.5, .5, 409, 179, svg.colors["card"], rx=6, stroke=svg.colors["edge"])
-    svg.rect(.5, .5, 3, 179, ACCENT)
-    svg.raw(f'<g fill="none" stroke="{ACCENT}" stroke-width="2" opacity=".15"><path d="M317 65l34 -20 34 20v40l-34 20-34-20ZM317 65l34 20 34-20M351 85v40"/><circle cx="351" cy="85" r="12"/></g>')
+    svg.rect(.5, .5, 3, 179, svg.colors["accent"])
+    svg.raw(f'<g fill="none" stroke="{svg.colors["accent"]}" stroke-width="2" opacity=".15"><path d="M317 65l34 -20 34 20v40l-34 20-34-20ZM317 65l34 20 34-20M351 85v40"/><circle cx="351" cy="85" r="12"/></g>')
     svg.text(22, 34, repo["name"], 16, "text", font_weight=600)
     language = repo["language"] or "Profile"
     svg.text(388, 56, language, 11, COLORS.get(language, "muted"), text_anchor="end")
@@ -455,7 +455,7 @@ def card(repo, data, theme):
     for index, line in enumerate(textwrap.wrap(description, 43)[:3]):
         svg.text(22, 80 + index * 19, line, 12.5)
     svg.rect(22, 141, 366, 1, svg.colors["edge"])
-    svg.text(22, 163, f'{repo["stargazers_count"]} stars', 11, ACCENT)
+    svg.text(22, 163, f'{repo["stargazers_count"]} stars', 11, svg.colors["accent"])
     days = max(0, (date.fromisoformat(data["as_of"]) - date.fromisoformat(repo["pushed_at"][:10])).days)
     svg.text(388, 163, "pushed today" if not days else f"pushed {days}d ago", 11, "dim", text_anchor="end")
     return svg
@@ -478,7 +478,7 @@ def kepler(theme):
     rows = [("SynapseNet", "Decentralized intelligence, built in the open."), ("Local AI + NAAN", "Local models and knowledge contributions."), ("Tor + Proof of Emergence", "Peer communication and knowledge validation."), ("C++ / Rust / Tauri / Svelte", "From the native engine to the desktop cell.")]
     for index, (title, subtitle) in enumerate(rows):
         y = 88 + index * 51
-        svg.rect(246, y - 12, 2, 14, ACCENT)
+        svg.rect(246, y - 12, 2, 14, svg.colors["accent"])
         svg.text(260, y, title, 13, "text", font_weight=600)
         svg.text(260, y + 19, subtitle, 11.5)
     svg.text(260, 298, "Intelligence belongs to everyone. / Alpha development.", 11, "dim")
@@ -494,7 +494,7 @@ def upstream(data, theme):
     for index, row in enumerate(rows):
         y = 70 + index * 44
         svg.text(22, y, row["repo"], 12, "text")
-        svg.text(22, y + 18, textwrap.shorten(row["title"], width=100, placeholder="..."), 11, ACCENT)
+        svg.text(22, y + 18, textwrap.shorten(row["title"], width=100, placeholder="..."), 11, svg.colors["accent"])
     return svg
 
 
@@ -503,7 +503,7 @@ def footer(data, theme):
     svg.section("Elsewhere", "@" + LOGIN)
     for x, width, value in [(140, 160, "SynapseNet"), (314, 196, "GitHub profile"), (524, 176, "Issues + ideas")]:
         svg.rect(x, 59, width, 30, svg.colors["card"], rx=15, stroke=svg.colors["edge"])
-        svg.text(x + width / 2, 79, value, 11, ACCENT, text_anchor="middle")
+        svg.text(x + width / 2, 79, value, 11, svg.colors["accent"], text_anchor="middle")
     svg.text(420, 116, "Local models. Shared knowledge. Open infrastructure.", 11, "dim", text_anchor="middle")
     svg.text(420, 138, f'Public data snapshot / {data["as_of"]} UTC / refreshed daily', 10, "dim", text_anchor="middle")
     return svg
