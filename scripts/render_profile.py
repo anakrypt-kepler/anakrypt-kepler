@@ -21,6 +21,7 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "assets"
 LOGIN = "anakrypt-kepler"
+ASSET_REV = "20261124"
 THEMES = {
     "dark": {"text": "#F4F4F5", "muted": "#A1A1AA", "dim": "#71717A", "edge": "#24242A", "card": "#101013", "grid": "#151518", "accent": "#D4D4D8"},
     "light": {"text": "#18181B", "muted": "#52525B", "dim": "#71717A", "edge": "#E4E4E7", "card": "#FAFAFA", "grid": "#F4F4F5", "accent": "#18181B"},
@@ -516,7 +517,7 @@ def render(data):
         for name in ["Synapsenetai", LOGIN]:
             graphics["card-" + name.lower()] = card(repos[name], data, theme)
         for name, graphic in graphics.items():
-            (ASSETS / f"{name}-{theme}.svg").write_text(graphic.finish(), encoding="utf-8")
+            (ASSETS / f"{name}-{theme}-{ASSET_REV}.svg").write_text(graphic.finish(), encoding="utf-8")
 
 
 def main():

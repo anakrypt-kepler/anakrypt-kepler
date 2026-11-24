@@ -44,11 +44,11 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Keep generated artwork in the job log
         run: |
-          git add assets/*-dark.svg assets/*-light.svg assets/github-data.json
+          git add assets/*-dark-*.svg assets/*-light-*.svg assets/github-data.json
           if git diff --cached --quiet; then
             echo "Public profile data is unchanged."
             exit 0
           fi
           git diff --cached --stat
           echo "Artwork changed. Publish it from the anakrypt-kepler account; this workflow does not commit."
-          git restore --staged assets/*-dark.svg assets/*-light.svg assets/github-data.json
+          git restore --staged assets/*-dark-*.svg assets/*-light-*.svg assets/github-data.json

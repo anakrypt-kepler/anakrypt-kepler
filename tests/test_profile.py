@@ -62,7 +62,7 @@ class ProfileTests(unittest.TestCase):
         self.assertIn('&lt;script&gt;', svg.finish())
 
     def test_all_published_svgs_are_safe_and_valid(self):
-        files = list((ROOT / "assets").glob("*-dark.svg")) + list((ROOT / "assets").glob("*-light.svg"))
+        files = list((ROOT / "assets").glob(f"*-dark-{profile.ASSET_REV}.svg")) + list((ROOT / "assets").glob(f"*-light-{profile.ASSET_REV}.svg"))
         self.assertTrue(files, "Render the real snapshot before running asset checks")
         for path in files:
             root = ET.fromstring(path.read_text())
@@ -71,13 +71,13 @@ class ProfileTests(unittest.TestCase):
                 self.assertNotIn(element.tag.rsplit('}', 1)[-1], ['script', 'foreignObject'])
                 self.assertFalse(any(key.lower().startswith('on') for key in element.attrib))
             self.assertNotIn('@Rxflex', path.read_text())
-        mesh = (ROOT / 'assets/net-dark.svg').read_text()
+        mesh = (ROOT / f'assets/net-dark-{profile.ASSET_REV}.svg').read_text()
         self.assertIn('animateMotion', mesh)
         self.assertIn('prefers-reduced-motion', mesh)
         self.assertIn('.card{opacity:0}', mesh)
         self.assertIn('#naan:hover~#card-naan', mesh)
         self.assertIn('NaanAgent.svelte', mesh)
-        self.assertIn('data:image/jpeg;base64,', (ROOT / 'assets/portrait-dark.svg').read_text())
+        self.assertIn('data:image/jpeg;base64,', (ROOT / f'assets/portrait-dark-{profile.ASSET_REV}.svg').read_text())
 
 
     def sample_mesh_data(self):
